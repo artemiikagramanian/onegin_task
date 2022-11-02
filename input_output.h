@@ -5,6 +5,8 @@
 
 int get_file_size (FILE* file);
 
-void read_file (FILE* file, char* buf, int buf_size);
+char* read_file (FILE* file, int buf_size);
+
+void print_strings (FILE* file, String* string_arr, int n_strings);
 
 #endif

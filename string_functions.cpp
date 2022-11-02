@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "string_functions.h"
 
@@ -17,13 +18,15 @@ int count_strings (char* buf)
     return count_strings;
 }
 
-void split_strings (char* buf, int buf_size, struct String* string_arr, int n_strings)
+String* split_strings (char* buf, int buf_size, int n_strings)
 {
+    struct String* string_arr = (String*) calloc (n_strings, sizeof (String));
+
     int string_index = 0;
 
     char* pointer  = buf;
     int   str_size = 0;
-       
+
     while (string_index != n_strings)
     {
         if (*pointer == '\n' || *pointer == '\0')
@@ -38,13 +41,18 @@ void split_strings (char* buf, int buf_size, struct String* string_arr, int n_st
         }
 
         else if (*pointer == '\r')
-	{
+        {
             *pointer = '\n';
-	    str_size++;
-	}
+            str_size++;
+        }
 
-        else str_size++;
+        else
+        {
+            str_size++;
+        }
 
         pointer++;
     }
+
+    return string_arr;
 }

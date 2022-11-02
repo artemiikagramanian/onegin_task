@@ -6,28 +6,36 @@
 #include "string_functions.h"
 #include "sort.h"
 #include "input_output.h"
+#include "operations.h"
+#include "options.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    FILE* file = fopen ("hamlet.bin", "rb");
-    assert (file != NULL);
+    FILE* input_file = fopen ("hamlet.bin", "rb");
+    assert (input_file != NULL);
 
-    int buf_size = get_file_size (file);
+    FILE* output_file = fopen ("output.bin", "rb");
+    assert (output_file != NULL);
 
-    // read_file
-    char* buf = (char*) calloc (buf_size, sizeof (char));
+    int buf_size = get_file_size (input_file);
 
-    read_file (file, buf, buf_size);
+    char* buf = read_file (input_file, buf_size + 1);
 
     int n_strings = count_strings (buf);
 
-    struct String* string_arr = (String*) calloc (n_strings, sizeof (String));
-    split_strings (buf, buf_size, string_arr, n_strings);
 
-    booble_sort (string_arr, n_strings, sizeof (String), reverse_string_cmp);
-                                                     
-    for (int i = 0; i < n_strings; i++)
-    {
-        printf ("%d %s", string_arr[i].str_len, string_arr[i].str);
-    }
+    String* string_arr = split_strings (buf, buf_size, n_strings);
+
+    print_strings (output_file, string_arr, n_strings);
+
+
+    booble_sort   (string_arr,   n_strings, sizeof (String), string_cmp);
+    print_strings (output_file, string_arr,      n_strings);
+
+
+    booble_sort   ( string_arr,  n_strings, sizeof (String), reverse_string_cmp);
+    print_strings (output_file, string_arr,      n_strings);
+
+    quick_sort    ( string_arr,  n_strings, sizeof (String), string_cmp);
+    print_strings (output_file, string_arr,      n_strings);
 }

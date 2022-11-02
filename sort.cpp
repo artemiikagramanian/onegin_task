@@ -1,49 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <cctype>
 
 #include "sort.h"
+#include "operations.h"
 
-int reverse_strcmp (char* a_ptr, int a_size, char* b_ptr, int b_size)
-{
-    int i = 0;
-    char* a = a_ptr;
-    char* b = b_ptr;
-             
-    while (i < b_size && i < a_size)
-    {
-	if (*a < 'A' || *a > 'z')
-	{
-	     a--;
-	     i++;
-	}
-	
-	if (*b < 'A' || *b > 'z')
-	{
-	     b--;
-	     i++;
-	}
-
-
-	if (*a != *b) return *a - *b;
-
-	a--;
-	b--; 
-	i++;
-    }
-	
-    return (*a == *b) ? 0 : *a - *b;
-}
-
-void swap_string (void* a_ptr, void* b_ptr, size_t size)
-{                      
-    void* temp = calloc (size, 1);    
-
-    memcpy (temp , a_ptr, size); 
-
-    memcpy (a_ptr, b_ptr, size);
-    memcpy (b_ptr, temp , size);
-}
-     
 int string_cmp (void* a_ptr, void* b_ptr)
 {
     String* a = (String*) a_ptr;
@@ -57,23 +19,85 @@ int reverse_string_cmp (void* a_ptr, void* b_ptr)
     String* a = (String*) a_ptr;
     String* b = (String*) b_ptr;
 
-    return reverse_strcmp (a->str + a->str_len - 1, a->str_len, b->str + b->str_len - 1, b->str_len);
+    int i = 0;
+
+    int a_size = a->str_len;
+    int b_size = b->str_len;
+
+    char* a_str = a->str + a_size - 1;
+    char* b_str = b->str + b_size - 1;
+
+    while (i < b_size && i < a_size)
+    {
+        if (isalnum (*a_str) == 0)
+        {
+             a_str--;
+             i++;
+        }
+
+        if (isalnum (*b_str) == 0)
+        {
+             b_str--;
+             i++;
+        }
+
+
+        if (*a_str != *b_str) return *a_str - *b_str;
+
+        a_str--;
+        b_str--;
+        i++;
+    }
+
+    return (b_size == a_size) ? 0 : *a_str - *b_str;
 }
 
-// void* buffer, size_t Text_size, size_t type,
-
-void booble_sort (void* string_array, size_t n_strings, size_t type,
-                  int string_cmp (void* first_str, void* second_str))
+void booble_sort (void* type_arr, size_t n_strings, size_t type,
+                  int type_cmp (void* first_str, void* second_str))
 {
     for (int i = 0; i < n_strings; i++)
     {
         for (int j = i + 1; j < n_strings; j++)
         {
-            // (char*)Text + i * Text_size
-            if (string_cmp ((String*) string_array + i, (String*) string_array + j) > 0)
+            if (type_cmp ((char*) type_arr + i*type, (char*) type_arr + j*type) > 0)
             {
-     		swap_string ((String*) string_array + i, (String*) string_array + j, sizeof (String));
-	    }
+                swap_elems ((char*) type_arr + i*type, (char*) type_arr + j*type, type);
+            }
         }
     }
+}
+
+void quick_sort (void* type_arr, size_t n_strings, size_t type,
+                int type_cmp (void* first_str, void* second_str))
+{
+    size_t begin_ptr = 0;
+    size_t end_ptr   = n_strings - 1;
+
+    void* mid = (char*) type_arr + (n_strings / 2) * type;
+
+    while (begin_ptr <= end_ptr)
+    {
+        while (type_cmp ((char*)type_arr + begin_ptr * type, mid) < 0 )
+        {
+            begin_ptr++;
+        }
+
+        while (type_cmp ((char*)type_arr + end_ptr   * type, mid) > 0 )
+        {
+            end_ptr--;
+        }
+
+        if (begin_ptr <= end_ptr)
+        {
+            swap_elems ((char*)type_arr + begin_ptr * type, (char*)type_arr + end_ptr * type, type);
+
+            begin_ptr++;
+            end_ptr--;
+        }
+    }
+
+    if (end_ptr > 0) quick_sort ((char*) type_arr, end_ptr + 1, type, type_cmp);
+
+    if (begin_ptr < n_strings - 1) quick_sort ((char*) type_arr + begin_ptr * type,
+                                                      n_strings - begin_ptr, type, type_cmp);
 }

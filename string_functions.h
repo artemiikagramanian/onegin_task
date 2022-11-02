@@ -1,5 +1,5 @@
-#ifndef STRING_FINCTIONS_H
-#define STRING_FINCTIONS_H
+#ifndef STRING_FUNCTIONS_H
+#define STRING_FUNCTIONS_H
 
 struct String
 {
@@ -7,7 +7,7 @@ struct String
     int   str_len;
 };
 
-void split_strings (char* buf, int buf_size, struct String* Text, int text_size);
+String* split_strings (char* buf, int buf_size, int n_strings);
 
 int count_strings (char* buf);
 
